@@ -6,7 +6,7 @@ import {
 
 import * as firebase from "firebase";
 import 'firebase/firestore';
-// import firestore from '@react-native-firebase/firestore';
+import {Actions} from 'react-native-router-flux';
 
 var config = {
     apiKey: "AIzaSyAHL9bpnXibjXbeMuccKG6R0vdlHXWgFOM",
@@ -25,7 +25,10 @@ export default class Form extends Component {
 
     state = {
         email: '',
-        password: ''
+        password: '',
+        firstName: '',
+        lastName: '',
+        contact: ''
     }
 
     handleEmail = (text) => {
@@ -34,67 +37,137 @@ export default class Form extends Component {
     handlePassword = (text) => {
         this.setState({ password: text })
     }
-    action = (email, password) => {
-        if (this.props.type == 'Signup') {
+    handleFirstName = (text) => {
+        this.setState({ firstName: text })
+    }
+    handleLastName = (text) => {
+        this.setState({ lastName: text })
+    }
+    handleContact = (text) => {
+        this.setState({ contact: text })
+    }
+
+    register = (email, password,firstName,lastName,contact) => {
             try {
                 firebase
                     .auth()
                     .createUserWithEmailAndPassword(email, password)
                     .then(res => {
                         firebase.firestore().collection('user').doc(res.user.uid).set({
+                            firstName: firstName,
+                            lastName: lastName,
+                            contact: contact,
                             email: res.user.email
                         })
-                        .then(result => {
-                            alert('You have been successfully registered!');
-                        });
+                            .then(result => {
+                                alert('You have been successfully registered!');
+                                Actions.login()
+                            });
                     });
             } catch (error) {
                 console.log(error.toString(error));
             }
-        } else {
-            try {
-                firebase
-                    .auth()
-                    .signInWithEmailAndPassword(email, password)
-                    .then(res => {
-                        alert('You have been successfully loged in!');
-                    });
-            } catch (error) {
-                console.log(error.toString(error));
-            }
+    }
+
+
+    login = (email, password) => {
+        try {
+            firebase
+                .auth()
+                .signInWithEmailAndPassword(email, password)
+                .then(res => {
+                    alert('You have been login successfully!');
+                });
+        } catch (error) {
+            console.log(error.toString(error));
         }
     }
 
 
     render() {
-        return (
-            <View style={styles.container}>
-                <TextInput
-                    style={styles.inputBox}
-                    placeholder="Email"
-                    placeholderTextColor="#ffffff"
-                    onChangeText={this.handleEmail}
-                />
+        if (this.props.type == 'Signup') {
+            return (
+                <View style={styles.container}>
+                    <TextInput
+                        style={styles.inputBox}
+                        placeholder="First name"
+                        placeholderTextColor="#ffffff"
+                        onChangeText={this.handleFirstName}
+                    />
 
-                <TextInput
-                    style={styles.inputBox}
-                    placeholder="Password"
-                    placeholderTextColor="#ffffff"
-                    secureTextEntry={true}
-                    onChangeText={this.handlePassword}
-                />
+                    <TextInput
+                        style={styles.inputBox}
+                        placeholder="Last name"
+                        placeholderTextColor="#ffffff"
+                        onChangeText={this.handleLastName}
+                    />
 
-                <TouchableOpacity style={styles.button}
-                    onPress={
-                        () => this.action(this.state.email, this.state.password)
-                    }
-                >
-                    <Text style={styles.buttonText}>
-                        {this.props.type}
-                    </Text>
-                </TouchableOpacity>
-            </View>
-        )
+                    <TextInput
+                        style={styles.inputBox}
+                        placeholder="Contact number"
+                        placeholderTextColor="#ffffff"
+                        onChangeText={this.handleContact}
+                    />
+
+                    <TextInput
+                        style={styles.inputBox}
+                        placeholder="Email"
+                        placeholderTextColor="#ffffff"
+                        onChangeText={this.handleEmail}
+                    />
+
+                    <TextInput
+                        style={styles.inputBox}
+                        placeholder="Password"
+                        placeholderTextColor="#ffffff"
+                        secureTextEntry={true}
+                        onChangeText={this.handlePassword}
+                    />
+
+                    <TouchableOpacity style={styles.button}
+                        onPress={
+                            () => this.register(this.state.email, this.state.password, this.state.firstName, this.state.lastName, this.state.contact)
+                        }
+                    >
+                        <Text style={styles.buttonText}>
+                            {this.props.type}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            )
+        }else{
+
+            return (
+                <View style={styles.container}>
+        
+                    <TextInput
+                        style={styles.inputBox}
+                        placeholder="Email"
+                        placeholderTextColor="#ffffff"
+                        onChangeText={this.handleEmail}
+                    />
+
+                    <TextInput
+                        style={styles.inputBox}
+                        placeholder="Password"
+                        placeholderTextColor="#ffffff"
+                        secureTextEntry={true}
+                        onChangeText={this.handlePassword}
+                    />
+
+                    <TouchableOpacity style={styles.button}
+                        onPress={
+                            () => this.login(this.state.email, this.state.password)
+                        }
+                    >
+                        <Text style={styles.buttonText}>
+                            {this.props.type}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            )
+
+        }
     }
 }
 

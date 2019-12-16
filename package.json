@@ -10,8 +10,6 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@react-native-firebase/app": "^6.2.0",
-    "@react-native-firebase/auth": "^6.2.0",
     "firebase": "^7.6.0",
     "react": "16.9.0",
     "react-native": "0.61.5",
